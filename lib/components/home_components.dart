@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:restaurant_app/api/sh_methods.dart';
 import 'package:restaurant_app/models/menu.dart';
@@ -5,6 +7,10 @@ import 'package:restaurant_app/models/restaurant.dart';
 import 'package:restaurant_app/screens/order_screen.dart';
 import 'package:restaurant_app/utils/contant.dart';
 import 'package:restaurant_app/utils/size.dart';
+
+import '../utils/contant.dart';
+import '../utils/contant.dart';
+import '../utils/size.dart';
 
 class RateStars extends StatelessWidget {
   double rating;
@@ -58,7 +64,7 @@ class RestaurantItem extends StatelessWidget {
           ),
           decoration: BoxDecoration(
             image: DecorationImage(
-              image: restaurant.image,
+              image:  restaurant.image,
               fit: BoxFit.cover,
             ),
             boxShadow: [
@@ -113,7 +119,8 @@ class MenuItem extends StatefulWidget {
   final Menu menu;
   Restaurant restaurant;
   Function ref;
-  MenuItem({this.menu, this.ref, this.restaurant});
+  bool fav;
+  MenuItem({this.menu, this.ref, this.restaurant,this.fav =false});
 
   @override
   _MenuItemState createState() => _MenuItemState();
@@ -121,16 +128,35 @@ class MenuItem extends StatefulWidget {
 
 class _MenuItemState extends State<MenuItem> {
   bool isChecked = false;
-
+  bool favorite = false;
+  List fav;
+  @override
+  void initState() {
+    !widget.fav?getFavorite().then((value){
+     setState(() {
+       fav=value;
+     });
+    }).whenComplete((){
+        if(fav!=null){
+              for (var i in fav){
+                print(i);
+                if(i['id'].toString()==widget.menu.id.toString()){
+                  favorite = true;
+                }
+              }
+    }
+    }):null;
+    
+    
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
-    isChecked = false;
     for (int i = 0; i < orders.length; i++) {
       if (orders[i]['menu'].id == widget.menu.id) {
         isChecked = true;
       }
     }
-
     return Container(
       height: height * 0.35,
       margin: EdgeInsets.symmetric(
@@ -139,7 +165,7 @@ class _MenuItemState extends State<MenuItem> {
       ),
       decoration: BoxDecoration(
         image: DecorationImage(
-          image: widget.menu.image,
+          image:NetworkImage(widget.menu.image),
           fit: BoxFit.cover,
         ),
         boxShadow: [
@@ -152,13 +178,27 @@ class _MenuItemState extends State<MenuItem> {
         borderRadius: BorderRadius.circular(30),
       ),
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.end,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
+          !widget.fav?Align(
+            alignment:Alignment(0.9,-0.8),
+              child: IconButton(
+              icon: Icon(favorite? Icons.favorite:Icons.favorite_border,size: width*0.1,color: Color(0xffFF0000),),
+              onPressed: (){
+                List data = fav??[widget.menu.toJson()];
+               !favorite? data.add(widget.menu.toJson()):data.removeWhere((e) => e['id'].toString()==widget.menu.id.toString());
+                setFavorite(json.encode(data));
+                 setState(() {
+                  favorite = !favorite;
+                });
+              },
+            ),
+          ):Container(),
           Container(
-            height: height * 0.22,
+            height: height * 0.18,
             width: double.infinity,
             padding: EdgeInsets.symmetric(
-              vertical: height * 0.03,
+              vertical: height * 0.02,
               horizontal: width * 0.05,
             ),
             decoration: BoxDecoration(
@@ -167,6 +207,7 @@ class _MenuItemState extends State<MenuItem> {
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
                   widget.menu.name.toUpperCase(),
@@ -182,7 +223,7 @@ class _MenuItemState extends State<MenuItem> {
                     RateStars(
                       rating: widget.menu.rating,
                     ),
-                    Theme(
+                    widget.fav?Container():Theme(
                       data: ThemeData.dark(),
                       child: Checkbox(
                           value: isChecked,
@@ -202,7 +243,6 @@ class _MenuItemState extends State<MenuItem> {
                               });
                               orders.remove(menu);
                             }
-                            print(orders.length);
                             setState(() {
                               isChecked = value;
                             });

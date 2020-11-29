@@ -10,7 +10,7 @@ class APIMethods {
     String apiUrl = '$api/menus/' + id;
 
     Response response = await dio.get(apiUrl);
-
+    print(response.data);
     List<Menu> menus = [];
     response.data.forEach((menu) {
       menus.add(Menu(menu));

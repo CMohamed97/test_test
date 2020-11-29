@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:restaurant_app/screens/favorite_screen.dart';
 import 'package:restaurant_app/screens/home_screen.dart';
 import 'package:restaurant_app/utils/size.dart';
 
@@ -14,6 +15,7 @@ class MyApp extends StatelessWidget {
       initialRoute: HomeScreen.id,
       routes: {
         HomeScreen.id: (_) => HomeScreen(),
+        FavoriteItem.id:(_)=>FavoriteItem()
       },
     );
   }

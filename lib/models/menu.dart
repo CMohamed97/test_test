@@ -10,8 +10,9 @@ class Menu {
   int restId;
   String name;
   String descr;
+  String imagelink;
   int price;
-  NetworkImage image;
+  String image;
   dynamic rating;
 
   void fromJson(Map<String, dynamic> json) {
@@ -20,7 +21,19 @@ class Menu {
     this.name = json["name"];
     this.descr = json["descr"];
     this.price = json["price"];
-    this.image = NetworkImage(api + '/static/' + json["image"]);
+    this.image = !json["image"].contains("http")? api + '/static/' + json["image"]:json["image"];
     this.rating = json["rating"];
+  }
+
+  Map toJson() {
+    Map json = {};
+    json["id"] = this.id;
+    json["rest_id"] = this.restId;
+    json["name"] = this.name;
+    json["descr"] = this.descr;
+    json["price"] = this.price;
+    json["image"] = this.image;
+    json["rating"] = this.rating;
+    return json;
   }
 }

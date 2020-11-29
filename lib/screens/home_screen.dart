@@ -3,6 +3,7 @@ import 'package:restaurant_app/api/api_methods.dart';
 import 'package:restaurant_app/api/sh_methods.dart';
 import 'package:restaurant_app/components/home_components.dart';
 import 'package:restaurant_app/models/restaurant.dart';
+import 'package:restaurant_app/screens/favorite_screen.dart';
 import 'package:restaurant_app/screens/list_menu.dart';
 import 'package:restaurant_app/screens/order_screen.dart';
 import 'package:restaurant_app/utils/size.dart';
@@ -19,6 +20,7 @@ class HomeScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text('Restaurants'),
+        actions: [IconButton(icon: Icon(Icons.favorite),onPressed: ()=>Navigator.of(context).pushNamed(FavoriteItem.id),)],
       ),
       body: FutureBuilder(
         future: APIMethods.getAllRestaurants(),
@@ -31,7 +33,6 @@ class HomeScreen extends StatelessWidget {
           restaurants.forEach((r) {
             restaurantsID.add(r.id);
           });
-          print(restaurants[0].id);
           return ListView.builder(
             itemCount: restaurants.length,
             itemBuilder: (_, i) {
